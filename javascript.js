@@ -4,6 +4,11 @@
 
 var typed_chars = [];
 var my_string;
+var errors = 0;
+var start_time;
+var end_time;
+var time_spent;
+var first_keypress = true;
 
 function removeLeadingSpaces(input) {
   var i = 0, l = input.length;
@@ -23,17 +28,25 @@ $(document).ready(function() {
   my_string = $("textarea").text().trim().split("");
   my_string = removeLeadingSpaces(my_string);
   $("textarea").keydown(function(event_object){
-    if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
+    if (first_keypress) {
+      start_time = $.now();
+      first_keypress = false;
+    }
+    else if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
       console.log("Correct!");
       my_string.shift();
       console.log(my_string.join(""));
       if (my_string.length === 0) {
         console.log("You Won!");
+        console.log("Errors: " + errors);
+        end_time = $.now();
+        time_spent = (end_time - start_time)/1000;
+        console.log("Time Spent: " + time_spent + " seconds");
       }
     } else if (!/Shift/.test(event_object.key)){
       console.log(my_string.join(""));
       console.log("Wrong!");
-      console.log(event_object);
+      errors++;
     }
   });
 });
