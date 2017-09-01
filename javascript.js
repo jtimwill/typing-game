@@ -30,10 +30,16 @@ $(document).ready(function() {
       if (my_string.length === 0) {
         console.log("You Won!");
       }
-    } else {
+    } else if (!/Shift/.test(event_object.key)){
       console.log(my_string.join(""));
       console.log("Wrong!");
-      console.log(event_object.key);
+      console.log(event_object);
     }
   });
 });
+
+// 37 ArrowLeft
+// 38 ArrowRight
+// 39 ArrowUp
+// 40 ArrowDown
+// 16 Shift
