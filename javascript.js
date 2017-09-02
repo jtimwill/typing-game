@@ -27,38 +27,43 @@ function removeLeadingSpaces(input) {
 }
 
 $(document).ready(function() {
-  my_string = $("textarea").text().trim().split("");
-  my_string = removeLeadingSpaces(my_string);
   $("textarea").keydown(function(event_object){
-    if (first_keypress) {
+    if (first_keypress && event_object.key === "Enter") {
+      my_string = $("textarea").val().trim().split("");
+      my_string = removeLeadingSpaces(my_string);
       start_time = $.now();
       first_keypress = false;
       increment = 100/my_string.length;
+      $("#alert").append("<div class='alert alert-warning' role='alert'><strong>" +
+                          "GO!" + "</div>");
     }
-    else if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
-      console.log("Correct!");
-      my_string.shift();
-      progress += increment;
+    else if (!first_keypress) {
+      if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
+        console.log("Correct!");
+        my_string.shift();
+        progress += increment;
 
-      $(".progress-bar").css({
-        width: Math.floor(progress) + "%",
-      });
-      $(".progress-bar").text(Math.floor(progress) + "%")
+        $(".progress-bar").css({
+          width: Math.floor(progress) + "%",
+        });
+        $(".progress-bar").text(Math.floor(progress) + "%")
 
 
-      console.log(my_string.join(""));
-      if (my_string.length === 0) {
-        console.log("You Won!");
-        console.log("Errors: " + errors);
-        end_time = $.now();
-        time_spent = (end_time - start_time)/1000;
-        console.log("Time Spent: " + time_spent + " seconds");
-        $("#alert").append("<div class='alert alert-success' role='alert'><strong>You Won!</div>");
+        console.log(my_string.join(""));
+        if (my_string.length === 0) {
+          end_time = $.now();
+          time_spent = (end_time - start_time)/1000;
+          var message = "Done! Errors: " + errors +
+                        ". Time Spent: " + time_spent +
+                        " seconds"
+          $("#alert").append("<div class='alert alert-success' role='alert'><strong>" +
+                              message + "</div>");
+        }
+      } else if (!/Shift/.test(event_object.key)){
+        console.log(my_string.join(""));
+        console.log("Wrong!");
+        errors++;
       }
-    } else if (!/Shift/.test(event_object.key)){
-      console.log(my_string.join(""));
-      console.log("Wrong!");
-      errors++;
     }
   });
 });
