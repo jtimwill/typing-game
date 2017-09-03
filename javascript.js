@@ -5,47 +5,49 @@
 // https://stackoverflow.com/questions/35966821/using-jquery-to-highlight-a-character-of-a-string-on-a-webpage
 // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/setSelectionRange
 
-var typed_chars = [];
-var my_string;
-var errors = 0;
-var start_time;
-var end_time;
-var time_spent;
-var first_keypress = true;
-var increment = 0;
-var progress = 0;
-var text_length = 0;
-
-function removeLeadingSpaces(input) {
-  var i = 0, l = input.length;
-  while(input[i] !== undefined) {
-    if (/\n/.test(input[i])) {
-      while(/\s/.test(input[i+1])) {
-        input[i+1] = "";
-        i++;
-      }
-    }
-    i++;
-  }
-  return input.join("").split("");
-}
+var typed_chars = [],
+    my_string,
+    errors = 0,
+    start_time,
+    end_time,
+    time_spent,
+    first_keypress = true,
+    increment = 0,
+    progress = 0,
+    text_length = 0;
 
 $.fn.moveCursor = function (offset) {
-  return this[0].setSelectionRange(0, offset);;
+  return this[0].setSelectionRange(0, offset);
 };
+
+function handleCorrect(){
+  // console.log("Correct!");
+  // console.log(my_string.join(""));
+  my_string.shift();
+  $("textarea").moveCursor(text_length - my_string.length);
+  progress += increment;
+  $(".progress-bar").css({ width: progress + "%" });
+  $(".progress-bar").text(Math.round(progress) + "%");
+}
+
+function ignoreIndent() {
+  while(/\s/.test(my_string[1])) {
+    my_string.shift();
+    progress += increment;
+  }
+}
 
 $(document).ready(function() {
   $("textarea").keydown(function(event_object){
     if (first_keypress && event_object.key === "Enter") {
       event_object.preventDefault();
       my_string = $("textarea").val().trim().split("");
-      //my_string = removeLeadingSpaces(my_string);
       text_length = my_string.length;
       start_time = $.now();
       first_keypress = false;
       increment = 100/my_string.length;
       $("#alert").append("<div class='alert alert-warning' role='alert'><strong>" +
-                          "GO!" + "</div>");
+                          "Start Typing" + "</div>");
       $("textarea").focus().moveCursor(0);
     }
     else if (!first_keypress) {
@@ -53,32 +55,10 @@ $(document).ready(function() {
       if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
 
         if (event_object.key === "Enter" && /\n/.test(my_string[0])){
-          while(/\s/.test(my_string[1])) {
-            my_string.shift();
-            progress += increment;
-          }
-          my_string.shift();
-          console.log("Correct!");
-          console.log(my_string.join(""));
-
-          $("textarea").moveCursor(text_length - my_string.length);
-          progress += increment;
-          $(".progress-bar").css({
-            width: progress + "%",
-          });
-          $(".progress-bar").text(Math.round(progress) + "%");
-
+          ignoreIndent();
+          handleCorrect();
         } else {
-          console.log("Correct!");
-          console.log(my_string.join(""));
-
-          my_string.shift();
-          $("textarea").moveCursor(text_length - my_string.length);
-          progress += increment;
-          $(".progress-bar").css({
-            width: progress + "%",
-          });
-          $(".progress-bar").text(Math.round(progress) + "%");
+          handleCorrect();
         }
 
         if (my_string.length === 0) {
@@ -89,11 +69,12 @@ $(document).ready(function() {
                         " seconds"
           $("#alert").html("<div class='alert alert-success' role='alert'><strong>" +
                               message + "</div>");
+          $("h1").html("Refresh the page to try again");
         }
 
       } else if (!/Shift/.test(event_object.key)){
-        console.log(my_string.join(""));
-        console.log("Wrong!");
+        // console.log(my_string.join(""));
+        // console.log("Wrong!");
         errors++;
       }
     }
