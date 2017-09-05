@@ -37,6 +37,7 @@ function ignoreIndent() {
   }
 }
 
+
 $(document).ready(function() {
   $("textarea").keydown(function(event_object){
     if (first_keypress && event_object.key === "Enter") {
@@ -53,7 +54,6 @@ $(document).ready(function() {
     else if (!first_keypress) {
       event_object.preventDefault();
       if (event_object.key === my_string[0] || (event_object.key === "Enter" && /\n/.test(my_string[0]))) {
-
         if (event_object.key === "Enter" && /\n/.test(my_string[0])){
           ignoreIndent();
           handleCorrect();
